@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Flask Data Display</title>
+
+        <style>
+            body,
+            html {
+                margin: 0;
+                padding: 0;
+                height: 100%;
+                /* Set the height to 100% of the viewport */
+                overflow: hidden;
+                /* Prevent scrolling */
+                background: linear-gradient(to bottom right, #85a2f9, #a3bdf3, #c4d7ec, #e2f1e5);
+                /* Your gradient */
+                background-repeat: no-repeat;
+                /* Prevent the background from repeating */
+                background-attachment: fixed;
+                /* Keep the background fixed in place */
+                background-size: cover;
+                /* Cover the entire viewport */
+            }
+
+            .table-container {
+                width: 100%;
+                /* Adjust the width as needed */
+                max-height: 90vh;
+                /* Example: limit height to 90% of the viewport height */
+                overflow: auto;
+                /* Enable scrolling when content overflows */
+                margin: 5vh auto;
+                /* Optional: Add some margin to the top and bottom */
+                padding: 10px;
+                /* Optional: Add some padding inside the container */
+            }
+            /* Add some basic styling for better presentation */
+            table {
+                /* border-collapse: collapse; */
+                width: 50%;
+                margin-top: 7.5%;
+                border-radius: 10px;
+
+            }
+            td,
+            th {
+                border: 1px solid #000;
+                /* background-color: #c7ddcc; */
+                padding: 8px;
+                text-align: center;
+                font-size: 24px;
+                border-radius: 5px;
+            }
+            th {
+                background-color: #2c3e50;
+            }
+            .id-camera {
+                /* background-color: #f78fb3; */
+                background: linear-gradient(to bottom right, #2c3e50 ,#314355 , #526c86);
+
+            }
+            .temeratura-camera {
+                background-color: #ecf0f1;
+            }
+
+            .umiditate-camera {
+                background-color: #ecf0f1;
+            }
+            a {
+                color: inherit;
+                /* This makes the link have the same color as the surrounding text */
+                text-decoration: none;
+                /* Removes the underline from links */
+                font-weight: normal;
+            }
+            a:hover {
+                text-decoration: underline;
+                /* Adds an underline on hover for visual feedback */
+                color: #2c3e50;
+            }
+        </style>
+
+    </head>
+    <body>
+
+        <!-- Add the sorted matrix display table -->
+        <div class="table-container">
+            <table id="roomData" align="center">
+                <tr>
+                    <th onclick="sortTable(0)">Camera</th>
+                    <th onclick="sortTable(1)">Temperatura</th>
+                    <th onclick="sortTable(2)">Umiditate</th>
+                </tr>
+            </table>
+        </div>
+        <!-- Add dynamic content or update using JavaScript if needed -->
+        <script>
+            var dataString = "{{ data.message }}";
+
+            function decodeHtmlEntities(html) {
+                var doc = new DOMParser().parseFromString(html, 'text/html');
+                return doc.body.textContent || "";
+            }
+
+            var decodedDataString = decodeHtmlEntities(dataString);
+
+            // Convert the string to a JavaScript array without JSON parsing
+            var roomData = eval(decodedDataString);
+            var roomNameMapping = {
+                "1": "Bedroom",
+                "2": "Hallway",
+                "3": "Exit",
+                "4": "Bathroom",
+                "5": "Serigrafie"
+                // Add more room mappings as needed
+            };
+            var roomUrlMapping = {
+                "1": "http://192.168.0.108/",
+                "2": "http://192.168.0.102/",
+                "3": "http://192.168.0.103/",
+                "4": "http://192.168.0.104/",
+                "5": "http://192.168.0.105/"
+                // Add more room URLs as needed
+            };
+            function sortTable(columnIndex) {
+                console.log("SORTING");
+                console.log(columnIndex);
+                roomData.sort(function (a, b) {
+                    var x = a[columnIndex];
+                    var y = b[columnIndex];
+                    return isNaN(x) || isNaN(y)
+                        ? x.localeCompare(y)
+                        : x - y;
+                });
+                populateTable();
+
+            }
+            
+            function populateTable() {
+                var table = document.getElementById("roomData");
+                
+                // Clear existing rows
+                while (table.rows.length > 1) {
+                    table.deleteRow(1);
+                }
+              
+                // Populate the table with room data
+                for (var i = 0; i < roomData.length; i++) {
+
+                    var row = table.insertRow(-1);
+                    var roomID = roomData[i][0];
+                    var roomNumber = roomID.split(/\D+/)[0];
+                    var roomName = roomNameMapping[roomNumber] || roomNumber;
+                    var roomUrl = roomUrlMapping[roomNumber] || "javascript:void(0);"
+                    // Look up the room name from the mapping Add room name as the first cell in the
+                    // row
+                    var cell1 = row.insertCell(0);
+                    // cell1.innerHTML = roomName;
+                    cell1.innerHTML = '<a href="' + roomUrl + '" target="_blank">' + roomName + '</' +
+                            'a>';
+                    cell1.className = 'id-camera';
+
+                    // Add other data as per your existing structure
+                    for (var j = 1; j < roomData[i].length; j++) {
+                        var cell = row.insertCell(j);
+                        if (j === 1) {
+                            cell.innerHTML = roomData[i][j] + "°"; // Adding the degree symbol
+                            cell.className = 'temperatura-camera';
+                        } else {
+                            cell.innerHTML = roomData[i][j] + "%";
+                            cell.className = 'umiditate-camera';
+                        }
+                    }
+                }
+            }
+            sortTable(0);
+            // Use setTimeout to refresh the page every 3 seconds
+            function autoRefresh() {
+                setTimeout(function () {
+                    // Reload the page to get updated data
+                    location.reload(true);
+                }, 10000); // 3000 milliseconds = 3 seconds
+            }
+
+            // Call the functions when the page loads
+            populateTable();
+            autoRefresh();
+        </script>
+
+    </body>
+</html>
+86,628
