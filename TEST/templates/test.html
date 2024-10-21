@@ -12,7 +12,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script> <!-- Zoom plugin -->
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -71,157 +70,108 @@
         </div>
     </div>
     <script>
-        let charts = {};  // Obiect global pentru a stoca graficele existente
-
         // Funcție care filtrează datele pentru ultimele 24 de ore
         function filterLast24Hours(dataArray) {
             const now = new Date();
             const hoursInMillis = 24 * 60 * 60 * 1000; // 24 de ore în milisecunde
 
             return dataArray.filter(item => {
-                const itemTime = new Date(item[0]); // Presupunem că prima coloană este timpul
-                return (now - itemTime) <= hoursInMillis; // Păstrează doar datele din ultimele 24 de ore
+                const itemTime = new Date(item[0]); // presupunem că prima coloană este timpul
+                return (now - itemTime) <= hoursInMillis; // păstrează doar datele din ultimele 24 de ore
             });
-        }
-
-        // Funcție pentru actualizarea graficelor existente
-        function updateChart(chart, newLabels, newData) {
-            chart.data.labels = newLabels;  // Actualizează etichetele
-            chart.data.datasets.forEach((dataset, i) => {
-                dataset.data = newData[i];  // Actualizează dataseturile
-            });
-            chart.update();  // Reîmprospătează graficul
         }
 
         async function fetchData() {
-            try {
-                const response = await fetch('/data');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                return data;  // Returnăm datele noi fără caching
-            } catch (error) {
-                console.error('Fetch data error:', error);
-                document.getElementById('outsideTemp').textContent = "Error loading data";
-                return {};  // În caz de eroare, returnăm un obiect gol
-            }
+            const response = await fetch('/data');
+            const data = await response.json();
+            return data;
         }
 
         async function createCharts() {
             const data = await fetchData();
             const filteredOutsideTempsData = filterLast24Hours(data.outside_temperatures);
             const outsideTemps = filteredOutsideTempsData.map(item => item[1]);
-            const outsideTimes = filteredOutsideTempsData.map(item => new Date(item[0]).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
+            const outsideTimes = filteredOutsideTempsData.map(item => item[0]);
 
             document.getElementById('outsideTemp').textContent = data.current_outside_temp || "N/A";
 
             const roomChartsContainer = document.getElementById('roomCharts');
-            roomChartsContainer.innerHTML = ''; // Șterge graficele existente
+            roomChartsContainer.innerHTML = ''; // Clear existing charts
 
             Object.keys(data.room_temperatures).forEach(roomId => {
                 const roomData = filterLast24Hours(data.room_temperatures[roomId]);
                 const roomTemps = roomData.map(item => parseFloat(item[1]));
-                const roomTimes = roomData.map(item => new Date(item[3]).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
-                const latestRoomTemp = roomTemps[roomTemps.length - 1]; // Ultima temperatură
+                const roomTimes = roomData.map(item => item[3]);
+                const latestRoomTemp = roomTemps[roomTemps.length - 1]; // Get the latest temperature
 
-                // Alertă vizuală pentru temperaturi critice
                 const canvasWrapper = document.createElement('div');
                 canvasWrapper.classList.add('canvas-wrapper');
                 const title = document.createElement('h3');
                 title.textContent = `Room ${roomId} - Current Temperature: ${latestRoomTemp}°C`;
-
-                if (latestRoomTemp > 30) {
-                    title.style.color = 'red';  // Subliniează temperatura critică
-                    alert(`Temperatura în camera ${roomId} este peste limita normală!`);
-                }
-
                 const canvas = document.createElement('canvas');
                 canvasWrapper.appendChild(title);
                 canvasWrapper.appendChild(canvas);
                 roomChartsContainer.appendChild(canvasWrapper);
 
                 const ctx = canvas.getContext('2d');
-                
-                const isMobile = window.innerWidth < 600;
-                const dataPointsToShow = isMobile ? 10 : 50;  // Arată mai puține puncte pe mobil
-
-                const filteredRoomTemps = roomTemps.slice(-dataPointsToShow);
-                const filteredRoomTimes = roomTimes.slice(-dataPointsToShow);
-
-                // Creare grafic nou sau actualizare grafic existent
-                if (charts[roomId]) {
-                    updateChart(charts[roomId], filteredRoomTimes, [filteredRoomTemps, outsideTemps.slice(-dataPointsToShow)]);
-                } else {
-                    charts[roomId] = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: filteredRoomTimes,
-                            datasets: [
-                                {
-                                    label: `Room ${roomId} Temperature`,
-                                    data: filteredRoomTemps,
-                                    borderColor: 'rgba(52, 152, 219, 1)', // Albastru
-                                    backgroundColor: 'rgba(52, 152, 219, 0.2)', // Umplere albastră deschisă
-                                    fill: true,
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: roomTimes,
+                        datasets: [
+                            {
+                                label: `Room ${roomId} Temperature`,
+                                data: roomTemps,
+                                borderColor: 'rgba(52, 152, 219, 1)', // Blue
+                                backgroundColor: 'rgba(52, 152, 219, 0.2)', // Light blue fill
+                                fill: true,
+                            },
+                            {
+                                label: 'Outside Temperature',
+                                data: outsideTemps,
+                                borderColor: 'rgba(231, 76, 60, 1)', // Red
+                                backgroundColor: 'rgba(231, 76, 60, 0.2)', // Light red fill
+                                fill: true,
+                            }
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Time',
+                                    color: '#ecf0f1'
                                 },
-                                {
-                                    label: 'Outside Temperature',
-                                    data: outsideTemps.slice(-dataPointsToShow),
-                                    borderColor: 'rgba(231, 76, 60, 1)', // Roșu
-                                    backgroundColor: 'rgba(231, 76, 60, 0.2)', // Umplere roșie deschisă
-                                    fill: true,
-                                }
-                            ]
-                        },
-                        options: {
-                            scales: {
-                                x: {
-                                    title: {
-                                        display: true,
-                                        text: 'Time',
-                                        color: '#ecf0f1'
-                                    },
-                                    ticks: {
-                                        color: '#ecf0f1'
-                                    }
-                                },
-                                y: {
-                                    title: {
-                                        display: true,
-                                        text: 'Temperature (°C)',
-                                        color: '#ecf0f1'
-                                    },
-                                    ticks: {
-                                        color: '#ecf0f1'
-                                    }
+                                ticks: {
+                                    color: '#ecf0f1'
                                 }
                             },
-                            plugins: {
-                                zoom: {
-                                    pan: {
-                                        enabled: true,
-                                        mode: 'x'
-                                    },
-                                    zoom: {
-                                        enabled: true,
-                                        mode: 'x'
-                                    }
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Temperature (°C)',
+                                    color: '#ecf0f1'
                                 },
-                                legend: {
-                                    labels: {
-                                        color: '#ecf0f1'
-                                    }
+                                ticks: {
+                                    color: '#ecf0f1'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#ecf0f1'
                                 }
                             }
                         }
-                    });
-                }
+                    }
+                });
             });
         }
 
         createCharts();
-        setInterval(createCharts, 60000);  // Actualizează graficele la fiecare 60 de secunde
+        setInterval(createCharts, 60000);  // Update charts every 60 seconds
     </script>
 </body>
 </html>
