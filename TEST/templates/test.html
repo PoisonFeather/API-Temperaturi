@@ -72,7 +72,6 @@
     </div>
     <script>
         let charts = {};  // Obiect global pentru a stoca graficele existente
-        let cachedData = null;  // Pentru caching
 
         // Funcție care filtrează datele pentru ultimele 24 de ore
         function filterLast24Hours(dataArray) {
@@ -101,18 +100,11 @@
                     throw new Error('Network response was not ok');
                 }
                 const data = await response.json();
-                
-                // Dacă datele sunt identice cu cele din cache, returnăm cache-ul
-                if (cachedData && JSON.stringify(data) === JSON.stringify(cachedData)) {
-                    return cachedData;
-                }
-
-                cachedData = data;  // Actualizăm cache-ul
-                return data;
+                return data;  // Returnăm datele noi fără caching
             } catch (error) {
                 console.error('Fetch data error:', error);
                 document.getElementById('outsideTemp').textContent = "Error loading data";
-                return cachedData || {};  // În caz de eroare, returnează cache-ul vechi
+                return {};  // În caz de eroare, returnăm un obiect gol
             }
         }
 
