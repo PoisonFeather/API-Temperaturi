@@ -85,12 +85,12 @@ def open_socket():
                 room_id, temperature, humidity = parsed_data
                 current_time = datetime.now().strftime('%H:%M')
                 data_sent = [room_id, temperature, humidity, current_time]
+                check_matrix(data_sent[0], data_sent)
             else:
                 print("Invalid data format. Expected 3 elements but got:", len(parsed_data))
         else:
             print("Received empty data string.")
-
-        check_matrix(data_sent[0], data_sent)
+        
         client_socket.close()
 
 def fetch_outside_temperature():
