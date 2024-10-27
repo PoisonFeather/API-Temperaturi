@@ -28,6 +28,7 @@ last_notified_state = None
 def read_data():
     try:
         data = pd.read_csv('matrix_data.csv', header=None, names=['Room_ID', 'Temperature', 'Humidity', 'Timestamp'])
+        print("Matrix_data.csv opened!")
         room_data = {}
         for row in data.values.tolist():
             room_id = row[0]
@@ -36,9 +37,9 @@ def read_data():
             room_data[room_id].append(row)
         return room_data
     except FileNotFoundError:
-        pd.DataFrame(columns=['']).to_csv('matrix_data.csv', index=False)
-        print("File 'matrix_data.csv' not found. A new file has been created.")
-        return {}
+        open('matrix_data.csv', 'w').close()
+        print("File 'matrix_data.csv' not found. An empty file has been created.")
+        return read_data()
 
 def check_matrix(id, new_data):
     global current_room_temp
