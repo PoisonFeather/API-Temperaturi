@@ -19,7 +19,7 @@ log.setLevel(logging.ERROR)
 # Global variables to store temperatures
 camere = []
 outside_temperatures = []
-current_room_temp = None
+current_room_temp = {}
 current_outside_temp = None
 
 # Variables to keep track of the last state
@@ -53,7 +53,8 @@ def check_matrix(id, new_data):
         camere.append(new_data)
     
     # Update the current room temperature
-    current_room_temp[id] = new_data[1]
+    current_room_temp[id] = new_data[1]\
+   #print("Updated camere:", camere)
 
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -142,7 +143,7 @@ def check_temperatures():
 
 def flush_matrix():
     while True:
-        time.sleep(600)  # 600 seconds = 10 minutes
+        time.sleep(10)  # 600 seconds = 10 minutes
         global camere
         # Write the current matrix data to the CSV file before flushing
         with open('matrix_data.csv', 'a', newline='') as csvfile:
