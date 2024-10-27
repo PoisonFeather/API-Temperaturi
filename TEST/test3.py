@@ -16,10 +16,6 @@ app.logger.propagate = False
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
-# Pushover setup
-pushover_user_key = 'ukfcwr99re8bvfw8epirzeer61mjc8'
-pushover_api_token = 'ajd6qzkn4pm28qbu4wjzmquhnnk5yx'
-
 # Global variables to store temperatures
 camere = []
 outside_temperatures = []
@@ -40,7 +36,7 @@ def read_data():
             room_data[room_id].append(row)
         return room_data
     except FileNotFoundError:
-        pd.DataFrame(columns=['Room_ID', 'Temperature', 'Humidity', 'Timestamp']).to_csv('matrix_data.csv', index=False)
+        pd.DataFrame(columns=['']).to_csv('matrix_data.csv', index=False)
         print("File 'matrix_data.csv' not found. A new file has been created.")
         return {}
 
@@ -140,24 +136,8 @@ def check_temperatures():
             current_state = 'equal'
         
         if last_notified_state is None or current_state != last_notified_state:
-            if current_state == 'greater':
-                send_notification(f"Outside temperature {latest_outside_temp}°C is greater than inside temperature {latest_room_temp}°C in room {room_id}")
-            elif current_state == 'smaller':
-                send_notification(f"Outside temperature {latest_outside_temp}°C is smaller than inside temperature {latest_room_temp}°C in room {room_id}")
+            # Placeholder for notification logic if needed in the future
             last_notified_state = current_state
-
-def send_notification(message):
-    url = 'https://api.pushover.net/1/messages.json'
-    data = {
-        'token': pushover_api_token,
-        'user': pushover_user_key,
-        'message': message
-    }
-    response = requests.post(url, data=data)
-    if response.status_code == 200:
-        print('Notification sent successfully')
-    else:
-        print('Failed to send notification:', response.text)
 
 def flush_matrix():
     while True:
