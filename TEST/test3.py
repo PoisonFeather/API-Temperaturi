@@ -19,7 +19,7 @@ log.setLevel(logging.ERROR)
 # Global variables to store temperatures
 camere = []
 outside_temperatures = []
-current_room_temp = {}
+current_room_temp = None
 current_outside_temp = None
 
 # Variables to keep track of the last state
