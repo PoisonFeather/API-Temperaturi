@@ -72,13 +72,7 @@
     <script>
         // Funcție care filtrează datele pentru ultimele 24 de ore
         function filterLast24Hours(dataArray) {
-            const now = new Date();
-            const hoursInMillis = 24 * 60 * 60 * 1000; // 24 de ore în milisecunde
-
-            return dataArray.filter(item => {
-                const itemTime = new Date(item[0]); // presupunem că prima coloană este timpul
-                return (now - itemTime) <= hoursInMillis; // păstrează doar datele din ultimele 24 de ore
-            });
+            return dataArray; 
         }
 
         async function fetchData() {
