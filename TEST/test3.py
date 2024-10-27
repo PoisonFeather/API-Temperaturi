@@ -40,7 +40,8 @@ def read_data():
             room_data[room_id].append(row)
         return room_data
     except FileNotFoundError:
-        print(f"No data available. 'matrix_data.csv' not found.")
+        pd.DataFrame(columns=['Room_ID', 'Temperature', 'Humidity', 'Timestamp']).to_csv('matrix_data.csv', index=False)
+        print("File 'matrix_data.csv' not found. A new file has been created.")
         return {}
 
 def check_matrix(id, new_data):
