@@ -143,7 +143,7 @@ def check_temperatures():
 
 def flush_matrix():
     while True:
-        time.sleep(10)  # 600 seconds = 10 minutes
+        time.sleep(600)  # 600 seconds = 10 minutes
         global camere
         # Write the current matrix data to the CSV file before flushing
         with open('matrix_data.csv', 'a', newline='') as csvfile:
