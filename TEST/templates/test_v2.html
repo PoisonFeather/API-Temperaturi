@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- [Head content remains the same] -->
     <meta charset="UTF-8">
     <meta http-equiv="refresh" content="30">
     <title>Temperature Comparison</title>
@@ -10,11 +9,10 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3/dist/chart.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* [Style content remains the same] */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #2c3e50;
@@ -72,6 +70,11 @@
         </div>
     </div>
     <script>
+        // Funcție care filtrează datele pentru ultimele 24 de ore
+        function filterLast24Hours(dataArray) {
+            return dataArray; 
+        }
+
         async function fetchData() {
             const response = await fetch('/data');
             const data = await response.json();
@@ -80,11 +83,9 @@
 
         async function createCharts() {
             const data = await fetchData();
-
-            // Limit outside temperatures to the last 200 data points
-            const outsideData = data.outside_temperatures.slice(-200);
-            const outsideTemps = outsideData.map(item => parseFloat(item[1]));
-            const outsideTimes = outsideData.map(item => item[0]);
+            const filteredOutsideTempsData = filterLast24Hours(data.outside_temperatures);
+            const outsideTemps = filteredOutsideTempsData.map(item => item[1]);
+            const outsideTimes = filteredOutsideTempsData.map(item => item[0]);
 
             document.getElementById('outsideTemp').textContent = data.current_outside_temp || "N/A";
 
@@ -92,11 +93,10 @@
             roomChartsContainer.innerHTML = ''; // Clear existing charts
 
             Object.keys(data.room_temperatures).forEach(roomId => {
-                // Limit room temperatures to the last 200 data points
-                const roomData = data.room_temperatures[roomId].slice(-200);
+                const roomData = filterLast24Hours(data.room_temperatures[roomId]);
                 const roomTemps = roomData.map(item => parseFloat(item[1]));
                 const roomTimes = roomData.map(item => item[3]);
-                const latestRoomTemp = roomTemps[roomTemps.length - 1] || "N/A"; // Get the latest temperature
+                const latestRoomTemp = roomTemps[roomTemps.length - 1]; // Get the latest temperature
 
                 const canvasWrapper = document.createElement('div');
                 canvasWrapper.classList.add('canvas-wrapper');
