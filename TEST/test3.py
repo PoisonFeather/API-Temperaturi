@@ -130,7 +130,7 @@ def fetch_and_store_outside_temperature():
             data_sent = ["-1", str(outside_temp), outside_humidity, current_time]
             check_matrix(data_sent[0], data_sent)
         # Wait 10 minutes (600 seconds) between fetches - adjust as needed
-        time.sleep(1)
+        time.sleep(600)
 
 
 def check_temperatures():
@@ -158,8 +158,8 @@ def check_temperatures():
 def flush_matrix():
     while True:
         # Flush data every 10 minutes (600 sec)
-        #time.sleep(600)
-        time.sleep(5)
+        time.sleep(600)
+        #time.sleep(5)
         global camere
         # Write the current matrix data to the CSV file before flushing
         with open('matrix_data.csv', 'a', newline='') as csvfile:
