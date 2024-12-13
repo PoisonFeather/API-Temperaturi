@@ -21,6 +21,9 @@ camere = []
 current_room_temp = {}
 MAX_ENTRIES = 144
 
+
+flushSleepDuration = 5
+
 # Variables to keep track of the last state
 last_notified_state = None
 
@@ -129,8 +132,11 @@ def fetch_and_store_outside_temperature():
             # Store outside temperature as room_id = -1
             data_sent = ["-1", str(outside_temp), outside_humidity, current_time]
             check_matrix(data_sent[0], data_sent)
+        else:
+            data_sent = ["-1","0","0", current_time]
+            check_matrix(data_sent[0], data_sent)
         # Wait 10 minutes (600 seconds) between fetches - adjust as needed
-        time.sleep(600)
+        time.sleep(flushSleepDuration)
 
 
 def check_temperatures():
@@ -158,7 +164,7 @@ def check_temperatures():
 def flush_matrix():
     while True:
         # Flush data every 10 minutes (600 sec)
-        time.sleep(600)
+        time.sleep(flushSleepDuration)
         #time.sleep(5)
         global camere
         # Write the current matrix data to the CSV file before flushing
@@ -229,6 +235,10 @@ def data_route():
 
 
 if __name__ == '__main__':
+    with open('matrix_data.csv', 'w', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvfile.close()
+    print("Cleared matrix_data.csv")
     threading.Thread(target=open_socket, daemon=True).start()
     threading.Thread(target=flush_matrix, daemon=True).start()
     threading.Thread(target=fetch_and_store_outside_temperature, daemon=True).start()

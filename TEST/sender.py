@@ -26,7 +26,7 @@ count = 1
 if __name__ == "__main__":
     while True:
         # Example data: "ROOM 1 : 30*celcius"
-       # random_id=random.randint(0,100)
+        # random_id=random.randint(0,100)
         random_temp=random.randint(0,50)
         random_hum=random.randint(0,100)
         data_to_send=str(1)+" " + str(random_temp)+" "+str(random_hum)
