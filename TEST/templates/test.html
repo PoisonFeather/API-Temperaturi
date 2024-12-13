@@ -64,15 +64,17 @@
             <div class="col text-center">
                 <div class="temperature-info">
                     <p class="lead">Current Outside Temperature: <span id="outsideTemp" class="font-weight-bold">Loading...</span>°C</p>
+                    <p class="lead">Current Outside Humidity: <span id="outsideHumidity" class="font-weight-bold">Loading...</span>%</p>
                 </div>
                 <div id="roomCharts"></div>
             </div>
         </div>
     </div>
     <script>
-        // Funcție care filtrează datele pentru ultimele 24 de ore
+        // Filters data for the last 24 hours if needed
         function filterLast24Hours(dataArray) {
-            //console.log(dataArray)
+            // In this placeholder, we return the entire dataArray.
+            // Implement filtering logic if you want only last 24 hours data.
             return dataArray;
         }
 
@@ -84,25 +86,41 @@
 
         async function createCharts() {
             const data = await fetchData();
-            const filteredOutsideTempsData = filterLast24Hours(data.outside_temperatures);
-            const outsideTemps = filteredOutsideTempsData.map(item => item[1]);
-            const outsideTimes = filteredOutsideTempsData.map(item => item[0]);
 
+            // Outside data is currently in data.outside_temperatures
+            const outsideData = data.outside_temperatures ? filterLast24Hours(data.outside_temperatures) : [];
+            const outsideTemps = outsideData.map(item => parseFloat(item[1]));
+            const outsideHumid = outsideData.map(item => parseFloat(item[2]) || 0);
+            const outsideTimes = outsideData.map(item => item[3]);
+
+            // Update current outside temperature and humidity display
             document.getElementById('outsideTemp').textContent = data.current_outside_temp || "N/A";
+
+            // Get the latest humidity from outsideHumid if available
+            const latestOutsideHumidity = outsideHumid.length > 0 ? outsideHumid[outsideHumid.length - 1] : "N/A";
+            document.getElementById('outsideHumidity').textContent = latestOutsideHumidity;
 
             const roomChartsContainer = document.getElementById('roomCharts');
             roomChartsContainer.innerHTML = ''; // Clear existing charts
 
+            // Iterate through each room except -1 (outside)
             Object.keys(data.room_temperatures).forEach(roomId => {
+                if (roomId === '-1') {
+                    return; // Skip the outside here, it's included on each chart as a comparison
+                }
+
                 const roomData = filterLast24Hours(data.room_temperatures[roomId]);
                 const roomTemps = roomData.map(item => parseFloat(item[1]));
+                const roomHumid = roomData.map(item => parseFloat(item[2]) || 0);
                 const roomTimes = roomData.map(item => item[3]);
-                const latestRoomTemp = roomTemps[roomTemps.length - 1]; // Get the latest temperature
+
+                const latestRoomTemp = roomTemps.length > 0 ? roomTemps[roomTemps.length - 1] : "N/A";
+                const latestRoomHumid = roomHumid.length > 0 ? roomHumid[roomHumid.length - 1] : "N/A";
 
                 const canvasWrapper = document.createElement('div');
                 canvasWrapper.classList.add('canvas-wrapper');
                 const title = document.createElement('h3');
-                title.textContent = `Room ${roomId} - Current Temperature: ${latestRoomTemp}°C`;
+                title.textContent = `Room ${roomId} - Current Temperature: ${latestRoomTemp}°C, Humidity: ${latestRoomHumid}%`;
                 const canvas = document.createElement('canvas');
                 canvasWrapper.appendChild(title);
                 canvasWrapper.appendChild(canvas);
@@ -120,6 +138,7 @@
                                 borderColor: 'rgba(52, 152, 219, 1)', // Blue
                                 backgroundColor: 'rgba(52, 152, 219, 0.2)', // Light blue fill
                                 fill: true,
+                                yAxisID: 'y', // Temperature axis
                             },
                             {
                                 label: 'Outside Temperature',
@@ -127,6 +146,23 @@
                                 borderColor: 'rgba(231, 76, 60, 1)', // Red
                                 backgroundColor: 'rgba(231, 76, 60, 0.2)', // Light red fill
                                 fill: true,
+                                yAxisID: 'y', // Temperature axis
+                            },
+                            {
+                                label: `Room ${roomId} Humidity`,
+                                data: roomHumid,
+                                borderColor: 'rgba(46, 204, 113, 1)', // Green
+                                backgroundColor: 'rgba(46, 204, 113, 0.2)', // Light green fill
+                                fill: true,
+                                yAxisID: 'y1', // Humidity axis
+                            },
+                            {
+                                label: 'Outside Humidity',
+                                data: outsideHumid,
+                                borderColor: 'rgba(155, 89, 182, 1)', // Purple
+                                backgroundColor: 'rgba(155, 89, 182, 0.2)', // Light purple fill
+                                fill: true,
+                                yAxisID: 'y1', // Humidity axis
                             }
                         ]
                     },
@@ -143,6 +179,8 @@
                                 }
                             },
                             y: {
+                                type: 'linear',
+                                position: 'left',
                                 title: {
                                     display: true,
                                     text: 'Temperature (°C)',
@@ -150,6 +188,21 @@
                                 },
                                 ticks: {
                                     color: '#ecf0f1'
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'Humidity (%)',
+                                    color: '#ecf0f1'
+                                },
+                                ticks: {
+                                    color: '#ecf0f1'
+                                },
+                                grid: {
+                                    drawOnChartArea: false, // keep humidity grid separate
                                 }
                             }
                         },

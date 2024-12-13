@@ -19,21 +19,21 @@ def send_data(data):
     local_ip=get_local_ip()
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((local_ip, 8888))
-    client_socket.send(data.encode('utf-8'))
+    print(client_socket.send(data.encode('utf-8')))
     client_socket.close()
 
 count = 1
 if __name__ == "__main__":
     while True:
         # Example data: "ROOM 1 : 30*celcius"
-        random_id=random.randint(0,100)
+       # random_id=random.randint(0,100)
         random_temp=random.randint(0,50)
         random_hum=random.randint(0,100)
-        data_to_send=str(random_id)+" " + str(random_temp)+" "+str(random_hum)
+        data_to_send=str(1)+" " + str(random_temp)+" "+str(random_hum)
         # Send data to the server
         send_data(data_to_send)
         
         print(f"Sent data: {data_to_send}")
         
         # Wait for a while before sending the next packet (simulate periodic updates)
-        time.sleep(0.5)
+        time.sleep(1)
