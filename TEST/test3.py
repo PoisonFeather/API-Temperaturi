@@ -31,7 +31,7 @@ last_notified_state = None
 def read_data():
     try:
         data = pd.read_csv('matrix_data.csv', header=None, names=['Room_ID', 'Temperature', 'Humidity', 'Timestamp'])
-        print("Matrix_data.csv opened!")
+        #print("Matrix_data.csv opened!")
         room_data = {}
         outside_data = []
 
@@ -113,6 +113,7 @@ def fetch_outside_temperature():
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     }
     response = requests.get(search_url, headers=headers)
+    print(response.status_code)
     soup = BeautifulSoup(response.text, 'html.parser')
 
     weather_data = soup.find("span", {"id": "wob_tm"})
