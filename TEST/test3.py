@@ -21,6 +21,7 @@ camere = []
 outside_temperatures = []
 current_room_temp = {}
 current_outside_temp = None
+MAX_ENTRIES = 144
 
 # Variables to keep track of the last state
 last_notified_state = None
@@ -150,6 +151,15 @@ def flush_matrix():
             csvwriter = csv.writer(csvfile)
             csvwriter.writerows(camere)
         camere = []  # Reset the matrix
+        with open('matrix_data.csv', 'w', newline='') as f:
+            rows = list(csv.reader(f))
+
+        if len(rows) > MAX_ENTRIES:
+            rows = rows[-MAX_ENTRIES:]
+
+        with open('matrix_data.csv', 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerows(rows)
         print("Matrix flushed at", datetime.now().strftime("%H:%M"))
 
 # Start the socket and temperature fetching in separate threads
