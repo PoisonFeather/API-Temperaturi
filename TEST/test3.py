@@ -22,7 +22,7 @@ current_room_temp = {}
 MAX_ENTRIES = 144
 
 
-flushSleepDuration = 5
+flushSleepDuration = 600 # 600s = 10 min
 
 # Variables to keep track of the last state
 last_notified_state = None
