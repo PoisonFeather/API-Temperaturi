@@ -114,11 +114,11 @@ def fetch_outside_temperature():
 
     weather_data = soup.find("span", {"id": "wob_tm"})
     humidity_data = soup.find("span", {"id": "wob_hm"})
-    if weather_data and humidity_data:
+    if weather_data is not None and humidity_data is not None:
         return weather_data.text , humidity_data.text
     else:
         print("Could not find weather data on the page.")
-        return None
+        return None, None
 
 
 def fetch_and_store_outside_temperature():
