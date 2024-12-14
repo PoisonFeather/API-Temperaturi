@@ -71,11 +71,21 @@
         </div>
     </div>
     <script>
-        // Filters data for the last 24 hours if needed
-        function filterLast24Hours(dataArray) {
-            // In this placeholder, we return the entire dataArray.
-            // Implement filtering logic if you want only last 24 hours data.
-            return dataArray;
+        function filterDataByWindowSize(dataArray) {
+            const screenWidth = window.innerWidth;
+            let maxPoints;
+
+            // Adjust these breakpoints and values as desired:
+            if (screenWidth < 600) {
+                maxPoints = 24;   // fewer data points for smaller screens
+            } else if (screenWidth < 1200) {
+                maxPoints = 72;   // moderate number of points for medium screens
+            } else {
+                maxPoints = 144;  // more points for large screens
+            }
+
+            // Return only the last maxPoints
+            return dataArray.slice(-maxPoints);
         }
 
         async function fetchData() {
@@ -88,15 +98,13 @@
             const data = await fetchData();
 
             // Outside data is currently in data.outside_temperatures
-            const outsideData = data.outside_temperatures ? filterLast24Hours(data.outside_temperatures) : [];
+            const outsideData = data.outside_temperatures ? filterDataByWindowSize(data.outside_temperatures) : [];
             const outsideTemps = outsideData.map(item => parseFloat(item[1]));
             const outsideHumid = outsideData.map(item => parseFloat(item[2]) || 0);
             const outsideTimes = outsideData.map(item => item[3]);
 
             // Update current outside temperature and humidity display
             document.getElementById('outsideTemp').textContent = data.current_outside_temp || "N/A";
-
-            // Get the latest humidity from outsideHumid if available
             const latestOutsideHumidity = outsideHumid.length > 0 ? outsideHumid[outsideHumid.length - 1] : "N/A";
             document.getElementById('outsideHumidity').textContent = latestOutsideHumidity;
 
@@ -106,10 +114,10 @@
             // Iterate through each room except -1 (outside)
             Object.keys(data.room_temperatures).forEach(roomId => {
                 if (roomId === '-1') {
-                    return; // Skip the outside here, it's included on each chart as a comparison
+                    return; // Skip outside "room"
                 }
 
-                const roomData = filterLast24Hours(data.room_temperatures[roomId]);
+                const roomData = filterDataByWindowSize(data.room_temperatures[roomId]);
                 const roomTemps = roomData.map(item => parseFloat(item[1]));
                 const roomHumid = roomData.map(item => parseFloat(item[2]) || 0);
                 const roomTimes = roomData.map(item => item[3]);
@@ -135,34 +143,34 @@
                             {
                                 label: `Room ${roomId} Temperature`,
                                 data: roomTemps,
-                                borderColor: 'rgba(52, 152, 219, 1)', // Blue
-                                backgroundColor: 'rgba(52, 152, 219, 0.2)', // Light blue fill
+                                borderColor: 'rgba(52, 152, 219, 1)',
+                                backgroundColor: 'rgba(52, 152, 219, 0.2)',
                                 fill: true,
-                                yAxisID: 'y', // Temperature axis
+                                yAxisID: 'y',
                             },
                             {
                                 label: 'Outside Temperature',
                                 data: outsideTemps,
-                                borderColor: 'rgba(231, 76, 60, 1)', // Red
-                                backgroundColor: 'rgba(231, 76, 60, 0.2)', // Light red fill
+                                borderColor: 'rgba(231, 76, 60, 1)',
+                                backgroundColor: 'rgba(231, 76, 60, 0.2)',
                                 fill: true,
-                                yAxisID: 'y', // Temperature axis
+                                yAxisID: 'y',
                             },
                             {
                                 label: `Room ${roomId} Humidity`,
                                 data: roomHumid,
-                                borderColor: 'rgba(46, 204, 113, 1)', // Green
-                                backgroundColor: 'rgba(46, 204, 113, 0.2)', // Light green fill
+                                borderColor: 'rgba(46, 204, 113, 1)',
+                                backgroundColor: 'rgba(46, 204, 113, 0.2)',
                                 fill: true,
-                                yAxisID: 'y1', // Humidity axis
+                                yAxisID: 'y1',
                             },
                             {
                                 label: 'Outside Humidity',
                                 data: outsideHumid,
-                                borderColor: 'rgba(155, 89, 182, 1)', // Purple
-                                backgroundColor: 'rgba(155, 89, 182, 0.2)', // Light purple fill
+                                borderColor: 'rgba(155, 89, 182, 1)',
+                                backgroundColor: 'rgba(155, 89, 182, 0.2)',
                                 fill: true,
-                                yAxisID: 'y1', // Humidity axis
+                                yAxisID: 'y1',
                             }
                         ]
                     },
@@ -202,7 +210,7 @@
                                     color: '#ecf0f1'
                                 },
                                 grid: {
-                                    drawOnChartArea: false, // keep humidity grid separate
+                                    drawOnChartArea: false,
                                 }
                             }
                         },
@@ -219,7 +227,12 @@
         }
 
         createCharts();
-        setInterval(createCharts, 60000);  // Update charts every 60 seconds
+        setInterval(createCharts, 60000); // Update charts every 60 seconds
+
+        // Redraw charts on window resize
+        window.addEventListener('resize', () => {
+            createCharts();
+        });
     </script>
 </body>
 </html>
