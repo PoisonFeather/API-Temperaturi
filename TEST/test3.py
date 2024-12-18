@@ -112,16 +112,22 @@ def fetch_outside_temperature():
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     }
-    response = requests.get(search_url, headers=headers)
-    print(response.status_code)
-    soup = BeautifulSoup(response.text, 'html.parser')
+    try:
+        response = requests.get(search_url, headers=headers)
+        response.raise_for_status()  # Raise an HTTPError for bad responses (4xx and 5xx)
+        print(response.status_code)
 
-    weather_data = soup.find("span", {"id": "wob_tm"})
-    humidity_data = soup.find("span", {"id": "wob_hm"})
-    if weather_data is not None and humidity_data is not None:
-        return weather_data.text , humidity_data.text
-    else:
-        print("Could not find weather data on the page.")
+        soup = BeautifulSoup(response.text, 'html.parser')
+        weather_data = soup.find("span", {"id": "wob_tm"})
+        humidity_data = soup.find("span", {"id": "wob_hm"})
+
+        if weather_data is not None and humidity_data is not None:
+            return weather_data.text, humidity_data.text
+        else:
+            print("Could not find weather data on the page.")
+            return None, None
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
         return None, None
 
 
