@@ -47,6 +47,7 @@ def check_matrix(id, new_data):
     if not room_exists:
         camere.append(new_data)
     current_room_temp[id] = new_data[1]
+    print(f"Received data from sensor: Room {id}, Temperature {new_data[1]}, Humidity {new_data[2]}")
 
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
