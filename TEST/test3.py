@@ -131,7 +131,7 @@ def post_data():
 
 @app.route('/view', methods=['GET'])
 def view():
-    return render_template('test.html')
+    return render_template('home_index.html')
 
 @app.route('/data', methods=['GET'])
 def data_route():
