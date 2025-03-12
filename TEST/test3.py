@@ -19,7 +19,7 @@ camere = []
 current_room_temp = {}
 MAX_ENTRIES = 144
 
-flushSleepDuration = 600 # 600s = 10 min
+flushSleepDuration = 5 # 600s = 10 min
 
 def read_data():
     try:
