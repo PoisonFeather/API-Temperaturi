@@ -23,6 +23,7 @@ flushSleepDuration = 600 # 600s = 10 min
 
 def read_data():
     try:
+        print("Trying to read matrix_data.csv")
         data = pd.read_csv('matrix_data.csv', header=None, names=['Room_ID', 'Temperature', 'Humidity', 'Timestamp'])
         room_data = {}
         for row in data.values.tolist():
@@ -30,6 +31,7 @@ def read_data():
             if room_id not in room_data:
                 room_data[room_id] = []
             room_data[room_id].append(row)
+        print("Matrix data read successfully")
         return room_data
     except FileNotFoundError:
         open('matrix_data.csv', 'w').close()
@@ -39,6 +41,7 @@ def read_data():
 def check_matrix(id, new_data):
     global current_room_temp
     room_exists = False
+    print(f"Checking matrix for Room {id}, Data: {new_data}")
     for i, row in enumerate(camere):
         if int(row[0]) == int(id):
             camere[i] = new_data
@@ -71,7 +74,7 @@ def open_socket():
     while True:
         client_socket, client_address = server_socket.accept()
         data = client_socket.recv(1024).decode('utf-8')
-
+        print(f"Recieved data: {data}")
         if data.strip():
             parsed_data = data.split()
             if len(parsed_data) == 3:
@@ -89,6 +92,8 @@ def flush_matrix():
     while True:
         time.sleep(flushSleepDuration)
         global camere
+        print("Flushing matrix...")
+        print("Camere:",camere)
         with open('matrix_data.csv', 'a', newline='') as csvfile:
             csvwriter = csv.writer(csvfile)
             csvwriter.writerows(camere)
