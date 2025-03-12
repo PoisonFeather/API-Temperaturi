@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="5dd09c57-a46a-4057-abdd-3c5b86ad438f" name="Changes" comment="window resize" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;PoisonFeather&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/PoisonFeather/API-Temperaturi&quot;,
+    &quot;accountId&quot;: &quot;7fbc1df0-a565-4fa5-aa46-27e670f8534c&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="2q80REhlP6mL8m6kfFlXdzjv73d" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.sender.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test3.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/andreibiro/Code/Python/API-Temperaturi&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-PY-242.23339.19" />
+        <option value="bundled-python-sdk-0029f7779945-399fe30bd8c1-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.23339.19" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="5dd09c57-a46a-4057-abdd-3c5b86ad438f" name="Changes" comment="" />
+      <created>1734028884777</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1734028884777</updated>
+      <workItem from="1734028885777" duration="6354000" />
+      <workItem from="1734074737508" duration="786000" />
+      <workItem from="1734075569017" duration="558000" />
+      <workItem from="1734118419864" duration="146000" />
+      <workItem from="1734118684933" duration="1053000" />
+      <workItem from="1734119936078" duration="1334000" />
+      <workItem from="1734539429139" duration="1266000" />
+    </task>
+    <task id="LOCAL-00001" summary="console.log(dataArray)">
+      <option name="closed" value="true" />
+      <created>1734068667515</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1734068667515</updated>
+    </task>
+    <task id="LOCAL-00002" summary="schimbat matrix_flush sa tina doar 144 de puncte">
+      <option name="closed" value="true" />
+      <created>1734069402155</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1734069402155</updated>
+    </task>
+    <task id="LOCAL-00003" summary="scos console.log(dataArray)">
+      <option name="closed" value="true" />
+      <created>1734069455204</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1734069455204</updated>
+    </task>
+    <task id="LOCAL-00004" summary="adaugat umiditate afara la graph, schimbat logica la temperatura afara, e camera -1.">
+      <option name="closed" value="true" />
+      <created>1734075426959</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1734075426959</updated>
+    </task>
+    <task id="LOCAL-00005" summary="adaugat umiditate afara la graph, schimbat logica la temperatura afara, e camera -1.">
+      <option name="closed" value="true" />
+      <created>1734075605678</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1734075605678</updated>
+    </task>
+    <task id="LOCAL-00006" summary="reparat eroare &quot;cannot unpack non-iterable NoneType object&quot;">
+      <option name="closed" value="true" />
+      <created>1734118530971</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1734118530971</updated>
+    </task>
+    <task id="LOCAL-00007" summary="-Adaugat variabila pentru sleep timer&#10;-Adaugat temperaturi si umiditate de afara default in cazul in care nu le gaseste pe net. (prob poate fi rezolvata asta trb sa vad)">
+      <option name="closed" value="true" />
+      <created>1734119458062</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1734119458062</updated>
+    </task>
+    <task id="LOCAL-00008" summary="-Adaugat variabila pentru sleep timer&#10;-Adaugat temperaturi si umiditate de afara default in cazul in care nu le gaseste pe net. (prob poate fi rezolvata asta trb sa vad)">
+      <option name="closed" value="true" />
+      <created>1734119514821</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1734119514821</updated>
+    </task>
+    <task id="LOCAL-00009" summary="-print la status code">
+      <option name="closed" value="true" />
+      <created>1734119699850</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1734119699850</updated>
+    </task>
+    <task id="LOCAL-00010" summary="window resize">
+      <option name="closed" value="true" />
+      <created>1734170835482</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1734170835482</updated>
+    </task>
+    <task id="LOCAL-00011" summary="window resize">
+      <option name="closed" value="true" />
+      <created>1734539503900</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1734539503900</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="console.log(dataArray)" />
+    <MESSAGE value="schimbat matrix_flush sa tina doar 144 de puncte" />
+    <MESSAGE value="scos console.log(dataArray)" />
+    <MESSAGE value="adaugat umiditate afara la graph, schimbat logica la temperatura afara, e camera -1." />
+    <MESSAGE value="reparat eroare &quot;cannot unpack non-iterable NoneType object&quot;" />
+    <MESSAGE value="-Adaugat variabila pentru sleep timer&#10;-Adaugat temperaturi si umiditate de afara default in cazul in care nu le gaseste pe net. (prob poate fi rezolvata asta trb sa vad)" />
+    <MESSAGE value="-print la status code" />
+    <MESSAGE value="window resize" />
+    <option name="LAST_COMMIT_MESSAGE" value="window resize" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/API_Temperaturi$test3.coverage" NAME="test3 Coverage Results" MODIFIED="1734539484671" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/TEST" />
+    <SUITE FILE_PATH="coverage/API_Temperaturi$sender.coverage" NAME="sender Coverage Results" MODIFIED="1734171164670" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/TEST" />
+  </component>
+</project>
