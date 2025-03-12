@@ -130,9 +130,7 @@
                 roomData.sort(function (a, b) {
                     var x = a[columnIndex];
                     var y = b[columnIndex];
-                    return isNaN(x) || isNaN(y)
-                        ? x.localeCompare(y)
-                        : x - y;
+                    return parseFloat(x) - parseFloat(y);
                 });
                 populateTable();
 
@@ -177,18 +175,27 @@
             }
             sortTable(0);
             // Use setTimeout to refresh the page every 3 seconds
-            function autoRefresh() {
-                setTimeout(function () {
-                    // Reload the page to get updated data
-                    location.reload(true);
-                }, 10000); // 3000 milliseconds = 3 seconds
-            }
+            // function autoRefresh() {
+            //     setTimeout(function () {
+            //         // Reload the page to get updated data
+            //         location.reload(true);
+            //     }, 10000); // 3000 milliseconds = 3 seconds
+            // }
 
             // Call the functions when the page loads
+        function fetchAndUpdateData() {
+    fetch('/data')
+        .then(response => response.json())
+        .then(data => {
+            roomData = Object.values(data.room_temperatures);
             populateTable();
-            autoRefresh();
+        })
+        .catch(error => console.error('Error fetching data:', error));
+}
+        setInterval(fetchAndUpdateData, 10000);
+            populateTable();
+            //autoRefresh();
         </script>
 
     </body>
 </html>
-86,628
