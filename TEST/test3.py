@@ -136,9 +136,12 @@ def view():
 @app.route('/data', methods=['GET'])
 def data_route():
     room_temperatures = read_data()
+    if not room_temperatures:
+        print("Warning: No room data found.")  # Debugging
+        room_temperatures = {}  # Inițializăm cu un dicționar gol
+
     response = {
-        "room_temperatures": room_temperatures,
-        "current_room_temp": current_room_temp
+        "room_temperatures": room_temperatures
     }
     return jsonify(response)
 
