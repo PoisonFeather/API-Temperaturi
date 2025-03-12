@@ -1,69 +1,94 @@
-var roomData = [];
-
-var roomNameMapping = {
-    "1": "Bedroom",
-    "2": "Hallway",
-    "3": "Exit",
-    "4": "Bathroom",
-    "5": "Serigrafie"
-};
-
-var roomUrlMapping = {
-    "1": "http://192.168.0.108/",
-    "2": "http://192.168.0.102/",
-    "3": "http://192.168.0.103/",
-    "4": "http://192.168.0.104/",
-    "5": "http://192.168.0.105/"
-};
-
-function sortTable(columnIndex) {
-    roomData.sort(function (a, b) {
-        return parseFloat(a[columnIndex]) - parseFloat(b[columnIndex]);
-    });
-    populateTable();
+function filterDataByWindowSize(dataArray) {
+    const screenWidth = window.innerWidth;
+    let maxPoints = screenWidth < 600 ? 24 : screenWidth < 1200 ? 72 : 144;
+    return dataArray.slice(-maxPoints);
 }
 
-function populateTable() {
-    var table = document.getElementById("roomData");
-
-    while (table.rows.length > 1) {
-        table.deleteRow(1);
+async function fetchData() {
+    try {
+        const response = await fetch('/data');
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        return { room_temperatures: {} };
     }
+}
 
-    for (var i = 0; i < roomData.length; i++) {
-        var row = table.insertRow(-1);
-        var roomID = roomData[i][0];
-        var roomNumber = roomID.split(/\D+/)[0];
-        var roomName = roomNameMapping[roomNumber] || roomNumber;
-        var roomUrl = roomUrlMapping[roomNumber] || "javascript:void(0);"
+async function createCharts() {
+    const data = await fetchData();
+    const roomChartsContainer = document.getElementById('roomCharts');
+    roomChartsContainer.innerHTML = '';
 
-        var cell1 = row.insertCell(0);
-        cell1.innerHTML = '<a href="' + roomUrl + '" target="_blank">' + roomName + '</a>';
-        cell1.className = 'id-camera';
+    Object.keys(data.room_temperatures).forEach(roomId => {
+        const roomData = filterDataByWindowSize(data.room_temperatures[roomId]);
+        const roomTemps = roomData.map(item => parseFloat(item[1]));
+        const roomHumid = roomData.map(item => parseFloat(item[2]) || 0);
+        const roomTimes = roomData.map(item => item[3]);
 
-        for (var j = 1; j < roomData[i].length; j++) {
-            var cell = row.insertCell(j);
-            if (j === 1) {
-                cell.innerHTML = roomData[i][j] + "°C";
-                cell.className = 'temperatura-camera';
-            } else {
-                cell.innerHTML = roomData[i][j] + "%";
-                cell.className = 'umiditate-camera';
+        const latestRoomTemp = roomTemps.length > 0 ? roomTemps[roomTemps.length - 1] : "N/A";
+        const latestRoomHumid = roomHumid.length > 0 ? roomHumid[roomHumid.length - 1] : "N/A";
+
+        const canvasWrapper = document.createElement('div');
+        canvasWrapper.classList.add('canvas-wrapper');
+        const title = document.createElement('h3');
+        title.textContent = `Room ${roomId} - Current Temperature: ${latestRoomTemp}°C, Humidity: ${latestRoomHumid}%`;
+        const canvas = document.createElement('canvas');
+        canvasWrapper.appendChild(title);
+        canvasWrapper.appendChild(canvas);
+        roomChartsContainer.appendChild(canvasWrapper);
+
+        new Chart(canvas.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: roomTimes,
+                datasets: [
+                    {
+                        label: `Room ${roomId} Temperature`,
+                        data: roomTemps,
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        fill: true,
+                        yAxisID: 'y',
+                    },
+                    {
+                        label: `Room ${roomId} Humidity`,
+                        data: roomHumid,
+                        borderColor: 'rgba(46, 204, 113, 1)',
+                        backgroundColor: 'rgba(46, 204, 113, 0.2)',
+                        fill: true,
+                        yAxisID: 'y1',
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Time', color: '#ecf0f1' },
+                        ticks: { color: '#ecf0f1' }
+                    },
+                    y: {
+                        type: 'linear',
+                        position: 'left',
+                        title: { display: true, text: 'Temperature (°C)', color: '#ecf0f1' },
+                        ticks: { color: '#ecf0f1' }
+                    },
+                    y1: {
+                        type: 'linear',
+                        position: 'right',
+                        title: { display: true, text: 'Humidity (%)', color: '#ecf0f1' },
+                        ticks: { color: '#ecf0f1' },
+                        grid: { drawOnChartArea: false }
+                    }
+                },
+                plugins: {
+                    legend: { labels: { color: '#ecf0f1' } }
+                }
             }
-        }
-    }
+        });
+    });
 }
 
-function fetchAndUpdateData() {
-    fetch('/data')
-        .then(response => response.json())
-        .then(data => {
-            console.log("Fetched data:", data);  // Debugging în consolă
-            roomData = Object.values(data.room_temperatures);
-            populateTable();
-        })
-        .catch(error => console.error('Error fetching data:', error));
-}
-
-setInterval(fetchAndUpdateData, 10000);
-populateTable();
+createCharts();
+setInterval(createCharts, 60000);
+window.addEventListener('resize', createCharts);
