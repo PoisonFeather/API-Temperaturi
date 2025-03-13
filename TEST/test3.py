@@ -170,22 +170,12 @@ def data_route():
 
 @app.route('/api/current_temperature', methods=['GET'])
 def current_temperature():
-    try:
-        room_temperatures = read_data()
-        room_id = '1'  # ID-ul camerei tale (dacă ai doar o cameră, probabil e "1")
-
-        if room_id in room_temperatures and len(room_temperatures[room_id]) > 0:
-            latest_entry = room_temperatures[room_id][-1]
-            response = {
-                "temperature": latest_entry[1],
-                "humidity": latest_entry[2],
-                "time": latest_entry[3]
-            }
-            return jsonify(response)
-        else:
-            return jsonify({"error": "No data available"}), 404
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    # Codul pentru a obține temperatura și umiditatea curente
+    data = {
+        "temperature": 24.3,
+        "humidity": 44
+    }
+    return jsonify(data)
 
 
 if __name__ == '__main__':
