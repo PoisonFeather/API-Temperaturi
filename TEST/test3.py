@@ -23,20 +23,27 @@ flushSleepDuration = 10# 600s = 10 min
 
 def read_data():
     try:
-        print("Trying to read matrix_data.csv")
+        print("Trying to read matrix_data.csv")  # DEBUG
         data = pd.read_csv('matrix_data.csv', header=None, names=['Room_ID', 'Temperature', 'Humidity', 'Timestamp'])
+        print("Matrix data read successfully")  # DEBUG
+        print(data.head())  # DEBUG: vezi ce se citește efectiv
+
         room_data = {}
         for row in data.values.tolist():
             room_id = row[0]
             if room_id not in room_data:
                 room_data[room_id] = []
             room_data[room_id].append(row)
-        print("Matrix data read successfully")
+
         return room_data
     except FileNotFoundError:
         open('matrix_data.csv', 'w').close()
         print("File 'matrix_data.csv' not found. An empty file has been created.")
         return {}
+    except Exception as e:
+        print(f"Error reading matrix_data.csv: {e}")
+        return {}
+
 
 def check_matrix(id, new_data):
     global current_room_temp
@@ -92,19 +99,29 @@ def flush_matrix():
     while True:
         time.sleep(flushSleepDuration)
         global camere
-        print("Flushing matrix...")
-        print("Camere:",camere)
+
+        if not camere:  # Nu scrie în fișier dacă nu sunt date noi
+            print("No new data to flush.")
+            continue
+
+        print("Flushing data to CSV...")
         with open('matrix_data.csv', 'a', newline='') as csvfile:
             csvwriter = csv.writer(csvfile)
             csvwriter.writerows(camere)
-        camere = []  # Reset the matrix
+
+        camere = []  # Resetăm lista după scriere
+
+        # Asigură-te că nu ștergi totul accidental
         with open('matrix_data.csv', 'r', newline='') as f:
             rows = list(csv.reader(f))
+
         if len(rows) > MAX_ENTRIES:
+            print(f"Trimming matrix_data.csv to last {MAX_ENTRIES} entries")
             rows = rows[-MAX_ENTRIES:]
             with open('matrix_data.csv', 'w', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerows(rows)
+
         print("Matrix flushed at", datetime.now().strftime("%H:%M"))
 
 @app.route('/')
