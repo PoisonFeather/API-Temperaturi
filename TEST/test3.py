@@ -25,6 +25,8 @@ def read_data():
     try:
         print("Trying to read matrix_data.csv")  # DEBUG
         data = pd.read_csv('matrix_data.csv', header=None, names=['Room_ID', 'Temperature', 'Humidity', 'Timestamp'])
+        data['Humidity'] = data['Humidity'].astype(float).round().astype(int)
+
         print("Matrix data read successfully")  # DEBUG
         print(data.head())  # DEBUG: vezi ce se citește efectiv
 
@@ -48,6 +50,7 @@ def read_data():
 def check_matrix(id, new_data):
     global current_room_temp
     room_exists = False
+    new_data[2] = str(round(float(new_data[2])))
     print(f"Checking matrix for Room {id}, Data: {new_data}")
     for i, row in enumerate(camere):
         if int(row[0]) == int(id):
@@ -105,6 +108,8 @@ def flush_matrix():
             continue
 
         print("Flushing data to CSV...")
+        for i in range(len(camere)):
+            camere[i][2] = str(round(float(camere[i][2])))
         with open('matrix_data.csv', 'a', newline='') as csvfile:
             csvwriter = csv.writer(csvfile)
             csvwriter.writerows(camere)
