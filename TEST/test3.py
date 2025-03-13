@@ -170,13 +170,22 @@ def data_route():
 
 @app.route('/api/current_temperature', methods=['GET'])
 def current_temperature():
-    # Codul pentru a obține temperatura și umiditatea curente
-    data = {
-        "temperature": 24.3,
-        "humidity": 44
-    }
-    return jsonify(data)
+    room_data = read_data()
 
+    if "1" in room_data and len(room_data["1"]) > 0:
+        print(room_data["1"][-1])
+        last_entry = room_data["1"][-1]
+        data = {
+            "temperature": last_entry[1],
+            "humidity": last_entry[2],
+            "time": last_entry[3]
+        }
+    else:
+        data = {
+            "error": "No data available"
+        }
+
+    return jsonify(data)
 
 if __name__ == '__main__':
     with open('matrix_data.csv', 'w', newline='') as csvfile:
