@@ -4,16 +4,30 @@ function filterDataByWindowSize(dataArray) {
     return dataArray.slice(-maxPoints);
 }
 
+let busyFlag = false; // Variabilă pentru a preveni spam-ul
+
 async function fetchData() {
+    if (busyFlag) return;
+    busyFlag = true;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // Timeout de 5 secunde
+
     try {
-        const response = await fetch('/data');
+        const response = await fetch('/data', { signal: controller.signal });
         const data = await response.json();
+        console.log("Fetched data:", data);
         return data;
     } catch (error) {
         console.error('Error fetching data:', error);
         return { room_temperatures: {} };
+    } finally {
+        clearTimeout(timeoutId);
+        busyFlag = false;
     }
 }
+
+
 
 async function createCharts() {
     const data = await fetchData();
@@ -90,5 +104,5 @@ async function createCharts() {
 }
 
 createCharts();
-setInterval(createCharts, 6000);
+setInterval(createCharts, 30000);
 window.addEventListener('resize', createCharts);
