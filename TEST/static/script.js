@@ -90,5 +90,5 @@ async function createCharts() {
 }
 
 createCharts();
-setInterval(createCharts, 60);
+setInterval(createCharts, 600);
 window.addEventListener('resize', createCharts);
