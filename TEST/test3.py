@@ -108,6 +108,7 @@ def open_socket():
 
 
 
+
 def flush_matrix():
     global camere
     while True:
