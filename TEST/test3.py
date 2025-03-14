@@ -16,15 +16,15 @@ log.setLevel(logging.ERROR)
 
 # Global variables
 camere = []
-camere_lock = threading.Lock()
+current_room_temp = {}
 MAX_ENTRIES = 144
-flushSleepDuration = 60  # fiecare minut salvează datele pe disk
+
+flushSleepDuration = 60# 600s = 10 min
 
 def read_data():
     try:
         print("Trying to read matrix_data.csv")  # DEBUG
-        data = pd.read_csv('matrix_data.csv', header=None,
-                           names=['Room_ID', 'Temperature', 'Humidity', 'Timestamp'])
+        data = pd.read_csv('matrix_data.csv', header=None, names=['Room_ID', 'Temperature', 'Humidity', 'Timestamp'])
         data['Humidity'] = data['Humidity'].astype(float).round().astype(int)
 
         print("Matrix data read successfully")  # DEBUG
@@ -32,7 +32,7 @@ def read_data():
 
         room_data = {}
         for row in data.values.tolist():
-            room_id = str(row[0])
+            room_id = row[0]
             if room_id not in room_data:
                 room_data[room_id] = []
             room_data[room_id].append(row)
@@ -40,37 +40,27 @@ def read_data():
         return room_data
     except FileNotFoundError:
         open('matrix_data.csv', 'w').close()
-        print("File 'matrix_data.csv' not found. An empty file has been created.")  # DEBUG
+        print("File 'matrix_data.csv' not found. An empty file has been created.")
         return {}
     except Exception as e:
-        print(f"Error reading matrix_data.csv: {e}")  # DEBUG
+        print(f"Error reading matrix_data.csv: {e}")
         return {}
 
 
 def check_matrix(id, new_data):
-    global camere, current_room_temp
+    global current_room_temp
     room_exists = False
     new_data[2] = str(round(float(new_data[2])))
     print(f"Checking matrix for Room {id}, Data: {new_data}")
-
-    with camere_lock:
-        for i, row in enumerate(camere):
-            if int(row[0]) == int(id):
-                camere[i] = new_data
-                room_exists = True
-                break
-        if not room_exists:
-            camere.append(new_data)
-
-        current_room_temp[id] = new_data[1]
-
-        # Scrie direct în fișier imediat ce datele sunt primite:
-        with open('matrix_data.csv', 'a', newline='') as csvfile:
-            csvwriter = csv.writer(csvfile)
-            csvwriter.writerow(new_data)
-
+    for i, row in enumerate(camere):
+        if int(row[0]) == int(id):
+            camere[i] = new_data
+            room_exists = True
+            break
+    if not room_exists:
+        camere.append(new_data)
+    current_room_temp[id] = new_data[1]
     print(f"Received data from sensor: Room {id}, Temperature {new_data[1]}, Humidity {new_data[2]}")
-
 
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -93,48 +83,51 @@ def open_socket():
 
     while True:
         client_socket, client_address = server_socket.accept()
-        data = client_socket.recv(1024).decode('utf-8').strip()
-        print(f"Received data: {data}")
-        if data:
+        data = client_socket.recv(1024).decode('utf-8')
+        print(f"Recieved data: {data}")
+        if data.strip():
             parsed_data = data.split()
             if len(parsed_data) == 3:
                 room_id, temperature, humidity = parsed_data
                 current_time = datetime.now().strftime('%H:%M')
                 data_sent = [room_id, temperature, humidity, current_time]
-                with camere_lock:
-                    check_matrix(room_id, data_sent)
+                check_matrix(data_sent[0], data_sent)
+            else:
+                print("Invalid data format. Expected 3 elements but got:", len(parsed_data))
+        else:
+            print("Received empty data string.")
         client_socket.close()
 
-
-
-
-
 def flush_matrix():
-    global camere
     while True:
         time.sleep(flushSleepDuration)
-        with camere_lock:
-            if not camere:
-                print("No new data to flush.")
-                continue
+        global camere
 
-            print("Flushing data to CSV...")
-            with open('matrix_data.csv', 'a', newline='') as csvfile:
-                csvwriter = csv.writer(csvfile)
-                csvwriter.writerows(camere)
-                camere.clear()
+        if not camere:  # Nu scrie în fișier dacă nu sunt date noi
+            print("No new data to flush.")
+            continue
 
-            with open('matrix_data.csv', 'r', newline='') as f:
-                rows = list(csv.reader(f))
+        print("Flushing data to CSV...")
+        for i in range(len(camere)):
+            camere[i][2] = str(round(float(camere[i][2])))
+        with open('matrix_data.csv', 'a', newline='') as csvfile:
+            csvwriter = csv.writer(csvfile)
+            csvwriter.writerows(camere)
 
-            if len(rows) > MAX_ENTRIES:
-                print(f"Trimming matrix_data.csv to last {MAX_ENTRIES} entries")
-                rows = rows[-MAX_ENTRIES:]
-                with open('matrix_data.csv', 'w', newline='') as f:
-                    writer = csv.writer(f)
-                    writer.writerows(rows)
+        camere = []  # Resetăm lista după scriere
 
-            print("Matrix flushed at", datetime.now().strftime("%H:%M"))
+        # Asigură-te că nu ștergi totul accidental
+        with open('matrix_data.csv', 'r', newline='') as f:
+            rows = list(csv.reader(f))
+
+        if len(rows) > MAX_ENTRIES:
+            print(f"Trimming matrix_data.csv to last {MAX_ENTRIES} entries")
+            rows = rows[-MAX_ENTRIES:]
+            with open('matrix_data.csv', 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerows(rows)
+
+        print("Matrix flushed at", datetime.now().strftime("%H:%M"))
 
 @app.route('/')
 def index():
@@ -142,23 +135,21 @@ def index():
 
 @app.route('/post_data', methods=['POST'])
 def post_data():
-    data = request.form.get('data', '').strip()
-    if data:
+    data = request.form['data']
+    if data.strip():
         parsed_data = data.split()
         if len(parsed_data) == 3:
             room_id, temperature, humidity = parsed_data
             current_time = datetime.now().strftime('%H:%M')
             data_sent = [room_id, temperature, humidity, current_time]
-
-            with camere_lock:
-                check_matrix(room_id, data_sent)
-            return jsonify({"status": "success"})
+            check_matrix(data_sent[0], data_sent)
         else:
-            print(f"Invalid data format. Expected 3 elements but got: {len(parsed_data)}")  # DEBUG
-            return jsonify({"status": "failure", "reason": "Invalid data format"})
+            print("Invalid data format. Expected 3 elements but got:", len(parsed_data))
+            return index()
     else:
-        print("Received empty data string.")  # DEBUG
-        return jsonify({"status": "failure", "reason": "Empty data"})
+        print("Received empty data string.")
+        return index()
+    return index()
 
 @app.route('/view', methods=['GET'])
 def view():
@@ -168,18 +159,21 @@ def view():
 def data_route():
     room_temperatures = read_data()
     if not room_temperatures:
-        print("Warning: No room data found.")  # DEBUG
-        room_temperatures = {}
+        print("Warning: No room data found.")  # Debugging
+        room_temperatures = {}  # Inițializăm cu un dicționar gol
 
-    response = {"room_temperatures": room_temperatures}
+    response = {
+        "room_temperatures": room_temperatures
+    }
     return jsonify(response)
+
 
 @app.route('/api/current_temperature', methods=['GET'])
 def current_temperature():
     room_data = read_data()
-    print(room_data)  # DEBUG
+    print(room_data)
     if "1" in room_data and len(room_data["1"]) > 0:
-        print(room_data["1"][-1])  # DEBUG
+        print(room_data["1"][-1])
         last_entry = room_data["1"][-1]
         data = {
             "temperature": last_entry[1],
@@ -187,16 +181,17 @@ def current_temperature():
             "time": last_entry[3]
         }
     else:
-        data = {"error": "No data available"}
+        data = {
+            "error": "No data available"
+        }
 
     return jsonify(data)
 
 if __name__ == '__main__':
-    with open('matrix_data.csv', 'w') as f:
-        pass
-    print("Cleared matrix_data.csv")  # DEBUG
-
+    with open('matrix_data.csv', 'w', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvfile.close()
+    print("Cleared matrix_data.csv")
     threading.Thread(target=open_socket, daemon=True).start()
     threading.Thread(target=flush_matrix, daemon=True).start()
-
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host=get_local_ip(), port=5000, debug=False)
