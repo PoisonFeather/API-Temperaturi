@@ -46,11 +46,14 @@ def read_data():
         print(f"Error reading matrix_data.csv: {e}")  # DEBUG
         return {}
 
+
 def check_matrix(id, new_data):
+    global camere, current_room_temp
+    room_exists = False
+    new_data[2] = str(round(float(new_data[2])))
+    print(f"Checking matrix for Room {id}, Data: {new_data}")
+
     with camere_lock:
-        room_exists = False
-        new_data[2] = str(round(float(new_data[2])))
-        print(f"Checking matrix for Room {id}, Data: {new_data}")  # DEBUG
         for i, row in enumerate(camere):
             if int(row[0]) == int(id):
                 camere[i] = new_data
@@ -59,7 +62,15 @@ def check_matrix(id, new_data):
         if not room_exists:
             camere.append(new_data)
 
-        print(f"Received data from sensor: Room {id}, Temperature {new_data[1]}, Humidity {new_data[2]}")  # DEBUG
+        current_room_temp[id] = new_data[1]
+
+        # Scrie direct în fișier imediat ce datele sunt primite:
+        with open('matrix_data.csv', 'a', newline='') as csvfile:
+            csvwriter = csv.writer(csvfile)
+            csvwriter.writerow(new_data)
+
+    print(f"Received data from sensor: Room {id}, Temperature {new_data[1]}, Humidity {new_data[2]}")
+
 
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
