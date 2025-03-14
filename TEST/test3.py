@@ -89,12 +89,12 @@ def open_socket():
     server_socket.bind((local_ip, 8888))
     server_socket.listen(1)
 
-    print("Listening on port 8888...")  # DEBUG
+    print("Listening on port 8888...")
 
     while True:
         client_socket, client_address = server_socket.accept()
         data = client_socket.recv(1024).decode('utf-8').strip()
-        print(f"Recieved data: {data}")  # DEBUG
+        print(f"Received data: {data}")
         if data:
             parsed_data = data.split()
             if len(parsed_data) == 3:
@@ -103,23 +103,21 @@ def open_socket():
                 data_sent = [room_id, temperature, humidity, current_time]
                 with camere_lock:
                     check_matrix(room_id, data_sent)
-            else:
-                print(f"Invalid data format. Expected 3 elements but got: {len(parsed_data)}")  # DEBUG
-        else:
-            print("Received empty data string.")  # DEBUG
         client_socket.close()
+
+
+
 
 def flush_matrix():
     global camere
     while True:
         time.sleep(flushSleepDuration)
-
         with camere_lock:
             if not camere:
-                print("No new data to flush.")  # DEBUG
+                print("No new data to flush.")
                 continue
 
-            print("Flushing data to CSV...")  # DEBUG
+            print("Flushing data to CSV...")
             with open('matrix_data.csv', 'a', newline='') as csvfile:
                 csvwriter = csv.writer(csvfile)
                 csvwriter.writerows(camere)
@@ -127,14 +125,15 @@ def flush_matrix():
 
             with open('matrix_data.csv', 'r', newline='') as f:
                 rows = list(csv.reader(f))
+
             if len(rows) > MAX_ENTRIES:
-                print(f"Trimming matrix_data.csv to last {MAX_ENTRIES} entries")  # DEBUG
+                print(f"Trimming matrix_data.csv to last {MAX_ENTRIES} entries")
                 rows = rows[-MAX_ENTRIES:]
                 with open('matrix_data.csv', 'w', newline='') as f:
                     writer = csv.writer(f)
                     writer.writerows(rows)
 
-            print("Matrix flushed at", datetime.now().strftime("%H:%M"))  # DEBUG
+            print("Matrix flushed at", datetime.now().strftime("%H:%M"))
 
 @app.route('/')
 def index():
