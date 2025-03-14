@@ -172,7 +172,7 @@ def data_route():
 def current_temperature():
     room_data = read_data()
     print(room_data)
-    if "1" in room_data and len(room_data["1"]) > 0:
+    if "0" in room_data and len(room_data["1"]) > 0:
         print(room_data["1"][-1])
         last_entry = room_data["1"][-1]
         data = {
